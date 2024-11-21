@@ -95,21 +95,21 @@ pub fn print_board<const N: usize>(stdout: &mut RawTerminal<io::Stdout>, board: 
 
     write!(
         stdout,
-        "{}[u]   undo",
-        cursor::Goto(mid - 4, (3 + 3 * N + 3).try_into().unwrap())
+        "{}[u] undo    [s] save",
+        cursor::Goto(mid - 9, (3 + 3 * N + 3).try_into().unwrap())
+    )
+    .unwrap();
+
+    write!(
+        stdout,
+        "{}[q] quit    [l] load",
+        cursor::Goto(mid - 9, (3 + 3 * N + 4).try_into().unwrap())
     )
     .unwrap();
 
     write!(
         stdout,
         "{}[r] restart",
-        cursor::Goto(mid - 4, (3 + 3 * N + 4).try_into().unwrap())
-    )
-    .unwrap();
-
-    write!(
-        stdout,
-        "{}[q]   quit",
         cursor::Goto(mid - 4, (3 + 3 * N + 5).try_into().unwrap())
     )
     .unwrap();

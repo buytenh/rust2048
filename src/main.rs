@@ -3,8 +3,9 @@ mod cell;
 mod game_state;
 mod print_board;
 
-use std::io;
+use std::{fs, io, str, thread::sleep, time::Duration};
 
+use board::Board;
 use game_state::GameState;
 use print_board::print_board;
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
@@ -24,6 +25,33 @@ fn main() {
             Some(Ok(Key::Char('u'))) => {
                 game_state.undo();
             }
+            Some(Ok(Key::Char('s'))) => {
+                let _ = fs::write("game.json", game_state.board().serialize());
+            }
+            Some(Ok(Key::Char('l'))) => match fs::read("game.json") {
+                Ok(data) => match str::from_utf8(&data) {
+                    Ok(board) => match Board::deserialize(board) {
+                        Ok(board) => {
+                            game_state = GameState {
+                                board,
+                                prev_boards: Vec::new(),
+                            }
+                        }
+                        Err(err) => {
+                            eprintln!("deserialization error: {}", err);
+                            sleep(Duration::from_secs(2));
+                        }
+                    },
+                    Err(err) => {
+                        eprintln!("UTF-8 decoding error: {}", err);
+                        sleep(Duration::from_secs(2));
+                    }
+                },
+                Err(err) => {
+                    eprintln!("save game reading error: {}", err);
+                    sleep(Duration::from_secs(2));
+                }
+            },
             Some(Ok(Key::Left)) => {
                 game_state.left();
             }

@@ -1,8 +1,8 @@
 use crate::board::Board;
 
 pub struct GameState<const N: usize> {
-    board: Board<N>,
-    prev_boards: Vec<Board<N>>,
+    pub board: Board<N>,
+    pub prev_boards: Vec<Board<N>>,
 }
 
 impl<const N: usize> GameState<N> {

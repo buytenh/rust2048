@@ -2,6 +2,8 @@ use rand::{seq::SliceRandom, Rng};
 
 use crate::cell::Cell;
 
+mod serde;
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Board<const N: usize> {
     // TODO: remove 'pub'
