@@ -114,6 +114,37 @@ pub fn print_board<const N: usize>(stdout: &mut RawTerminal<io::Stdout>, board: 
     )
     .unwrap();
 
+    {
+        let mut orders: Vec<usize> = Vec::new();
+
+        for i in 0..N {
+            for j in 0..N {
+                if let Some(order) = board.cell[i][j].order() {
+                    let order: usize = order.into();
+
+                    if orders.len() < order + 1 {
+                        orders.resize(order + 1, 0);
+                    }
+                    orders[order] += 1;
+                }
+            }
+        }
+
+        for order in 1..orders.len() {
+            write!(
+                stdout,
+                "{}{:6}: {}",
+                cursor::Goto(
+                    (7 * N + 3).try_into().unwrap(),
+                    (3 + order).try_into().unwrap()
+                ),
+                1 << order,
+                orders[order]
+            )
+            .unwrap();
+        }
+    }
+
     if board.game_over() {
         write!(
             stdout,
