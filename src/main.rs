@@ -5,7 +5,7 @@ mod print_board;
 
 use std::{fs, io, str, thread::sleep, time::Duration};
 
-use board::Board;
+use board::{Board, BoardMove};
 use game_state::GameState;
 use print_board::print_board;
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
@@ -53,16 +53,16 @@ fn main() {
                 }
             },
             Some(Ok(Key::Left)) => {
-                game_state.left();
+                game_state.do_move(BoardMove::Left);
             }
             Some(Ok(Key::Right)) => {
-                game_state.right();
+                game_state.do_move(BoardMove::Right);
             }
             Some(Ok(Key::Up)) => {
-                game_state.up();
+                game_state.do_move(BoardMove::Up);
             }
             Some(Ok(Key::Down)) => {
-                game_state.down();
+                game_state.do_move(BoardMove::Down);
             }
             _ => {}
         }

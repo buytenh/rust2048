@@ -1,4 +1,4 @@
-use crate::board::Board;
+use crate::board::{Board, BoardMove};
 
 pub struct GameState<const N: usize> {
     pub board: Board<N>,
@@ -7,10 +7,7 @@ pub struct GameState<const N: usize> {
 
 impl<const N: usize> GameState<N> {
     pub fn new() -> Self {
-        let mut board = Board::<N>::new();
-
-        board.insert_random().unwrap();
-        board.insert_random().unwrap();
+        let board = Board::<N>::new();
 
         GameState {
             board,
@@ -22,32 +19,16 @@ impl<const N: usize> GameState<N> {
         &self.board
     }
 
-    fn try_move(&mut self, mut newboard: Board<N>) -> bool {
-        if newboard.cell != self.board.cell {
-            newboard.insert_random().unwrap();
-            self.prev_boards.push(self.board);
-            self.board = newboard;
+    pub fn do_move(&mut self, board_move: BoardMove) -> bool {
+        match self.board.do_move(board_move) {
+            None => false,
+            Some(newboard) => {
+                self.prev_boards.push(self.board);
+                self.board = newboard;
 
-            true
-        } else {
-            false
+                true
+            }
         }
-    }
-
-    pub fn left(&mut self) -> bool {
-        self.try_move(self.board.left())
-    }
-
-    pub fn right(&mut self) -> bool {
-        self.try_move(self.board.right())
-    }
-
-    pub fn up(&mut self) -> bool {
-        self.try_move(self.board.up())
-    }
-
-    pub fn down(&mut self) -> bool {
-        self.try_move(self.board.down())
     }
 
     pub fn undo(&mut self) -> bool {

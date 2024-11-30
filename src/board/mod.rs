@@ -12,13 +12,26 @@ pub struct Board<const N: usize> {
     pub score: usize,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum BoardMove {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
 impl<const N: usize> Board<N> {
     pub fn new() -> Board<N> {
-        Board {
+        let mut board = Board {
             cell: [[Cell::new_empty(); N]; N],
             moves: 0,
             score: 0,
-        }
+        };
+
+        board.insert_random().unwrap();
+        board.insert_random().unwrap();
+
+        board
     }
 
     pub fn game_over(&self) -> bool {
@@ -28,7 +41,7 @@ impl<const N: usize> Board<N> {
             && self.cell == self.down().cell
     }
 
-    pub fn pick_random_insertion(&self) -> Result<(usize, usize, Cell), ()> {
+    fn pick_random_insertion(&self) -> Result<(usize, usize, Cell), ()> {
         let mut empty_cells = Vec::with_capacity(N * N);
 
         for i in 0..N {
@@ -57,7 +70,7 @@ impl<const N: usize> Board<N> {
             .ok_or(())
     }
 
-    pub fn insert_random(&mut self) -> Result<(), ()> {
+    fn insert_random(&mut self) -> Result<(), ()> {
         let (i, j, cell) = self.pick_random_insertion()?;
 
         self.cell[i][j] = cell;
@@ -65,7 +78,7 @@ impl<const N: usize> Board<N> {
         Ok(())
     }
 
-    pub fn left(&self) -> Board<N> {
+    fn left(&self) -> Board<N> {
         let mut newboard = Self::new();
 
         newboard.moves = self.moves + 1;
@@ -86,7 +99,7 @@ impl<const N: usize> Board<N> {
         newboard
     }
 
-    pub fn right(&self) -> Board<N> {
+    fn right(&self) -> Board<N> {
         let mut newboard = Self::new();
 
         newboard.moves = self.moves + 1;
@@ -107,7 +120,7 @@ impl<const N: usize> Board<N> {
         newboard
     }
 
-    pub fn up(&self) -> Board<N> {
+    fn up(&self) -> Board<N> {
         let mut newboard = Self::new();
 
         newboard.moves = self.moves + 1;
@@ -128,7 +141,7 @@ impl<const N: usize> Board<N> {
         newboard
     }
 
-    pub fn down(&self) -> Board<N> {
+    fn down(&self) -> Board<N> {
         let mut newboard = Self::new();
 
         newboard.moves = self.moves + 1;
@@ -147,5 +160,21 @@ impl<const N: usize> Board<N> {
         }
 
         newboard
+    }
+
+    pub fn do_move(&self, board_move: BoardMove) -> Option<Board<N>> {
+        let mut newboard = match board_move {
+            BoardMove::Left => self.left(),
+            BoardMove::Right => self.right(),
+            BoardMove::Up => self.up(),
+            BoardMove::Down => self.down(),
+        };
+
+        if self.cell != newboard.cell {
+            newboard.insert_random().unwrap();
+            Some(newboard)
+        } else {
+            None
+        }
     }
 }
