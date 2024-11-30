@@ -5,6 +5,13 @@ pub struct GameState<const N: usize> {
     pub prev_boards: Vec<Board<N>>,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum GameStateAction {
+    Restart,
+    Move(BoardMove),
+    Undo,
+}
+
 impl<const N: usize> GameState<N> {
     pub fn new() -> Self {
         let board = Board::<N>::new();
@@ -19,25 +26,29 @@ impl<const N: usize> GameState<N> {
         &self.board
     }
 
-    pub fn do_move(&mut self, board_move: BoardMove) -> bool {
-        match self.board.do_move(board_move) {
-            None => false,
-            Some(newboard) => {
-                self.prev_boards.push(self.board);
-                self.board = newboard;
-
+    pub fn do_action(&mut self, game_action: GameStateAction) -> bool {
+        match game_action {
+            GameStateAction::Restart => {
+                self.board = Board::<N>::new();
+                self.prev_boards = Vec::new();
                 true
             }
-        }
-    }
+            GameStateAction::Move(board_move) => match self.board.do_move(board_move) {
+                None => false,
+                Some(newboard) => {
+                    self.prev_boards.push(self.board);
+                    self.board = newboard;
 
-    pub fn undo(&mut self) -> bool {
-        match self.prev_boards.pop() {
-            None => false,
-            Some(board) => {
-                self.board = board;
-                true
-            }
+                    true
+                }
+            },
+            GameStateAction::Undo => match self.prev_boards.pop() {
+                None => false,
+                Some(board) => {
+                    self.board = board;
+                    true
+                }
+            },
         }
     }
 }

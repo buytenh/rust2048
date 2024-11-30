@@ -6,7 +6,7 @@ mod print_board;
 use std::{fs, io, str, thread::sleep, time::Duration};
 
 use board::{Board, BoardMove};
-use game_state::GameState;
+use game_state::{GameState, GameStateAction};
 use print_board::print_board;
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
@@ -21,9 +21,11 @@ fn main() {
 
         match stdin.next() {
             Some(Ok(Key::Char('q'))) => break,
-            Some(Ok(Key::Char('r'))) => game_state = GameState::<4>::new(),
+            Some(Ok(Key::Char('r'))) => {
+                game_state.do_action(GameStateAction::Restart);
+            }
             Some(Ok(Key::Char('u'))) => {
-                game_state.undo();
+                game_state.do_action(GameStateAction::Undo);
             }
             Some(Ok(Key::Char('s'))) => {
                 let _ = fs::write("game.json", game_state.board().serialize());
@@ -53,16 +55,16 @@ fn main() {
                 }
             },
             Some(Ok(Key::Left)) => {
-                game_state.do_move(BoardMove::Left);
+                game_state.do_action(GameStateAction::Move(BoardMove::Left));
             }
             Some(Ok(Key::Right)) => {
-                game_state.do_move(BoardMove::Right);
+                game_state.do_action(GameStateAction::Move(BoardMove::Right));
             }
             Some(Ok(Key::Up)) => {
-                game_state.do_move(BoardMove::Up);
+                game_state.do_action(GameStateAction::Move(BoardMove::Up));
             }
             Some(Ok(Key::Down)) => {
-                game_state.do_move(BoardMove::Down);
+                game_state.do_action(GameStateAction::Move(BoardMove::Down));
             }
             _ => {}
         }
