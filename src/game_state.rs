@@ -2,7 +2,7 @@ use crate::board::{Board, BoardMove};
 
 pub struct GameState<const N: usize> {
     pub board: Board<N>,
-    pub prev_boards: Vec<Board<N>>,
+    pub prev_boards: Vec<(Board<N>, BoardMove)>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -10,6 +10,7 @@ pub enum GameStateAction {
     Restart,
     Move(BoardMove),
     Undo,
+    Reroll,
 }
 
 impl<const N: usize> GameState<N> {
@@ -36,7 +37,7 @@ impl<const N: usize> GameState<N> {
             GameStateAction::Move(board_move) => match self.board.do_move(board_move) {
                 None => false,
                 Some(newboard) => {
-                    self.prev_boards.push(self.board);
+                    self.prev_boards.push((self.board, board_move));
                     self.board = newboard;
 
                     true
@@ -44,11 +45,18 @@ impl<const N: usize> GameState<N> {
             },
             GameStateAction::Undo => match self.prev_boards.pop() {
                 None => false,
-                Some(board) => {
+                Some((board, _board_move)) => {
                     self.board = board;
                     true
                 }
             },
+            GameStateAction::Reroll => match self.prev_boards.pop() {
+                None => false,
+                Some((board, board_move)) => {
+                    self.board = board;
+                    self.do_action(GameStateAction::Move(board_move))
+                }
+            }
         }
     }
 }

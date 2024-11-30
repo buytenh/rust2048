@@ -22,7 +22,7 @@ fn main() {
         match stdin.next() {
             Some(Ok(Key::Char('q'))) => break,
             Some(Ok(Key::Char('r'))) => {
-                game_state.do_action(GameStateAction::Restart);
+                game_state.do_action(GameStateAction::Reroll);
             }
             Some(Ok(Key::Char('u'))) => {
                 game_state.do_action(GameStateAction::Undo);
@@ -54,6 +54,9 @@ fn main() {
                     sleep(Duration::from_secs(2));
                 }
             },
+            Some(Ok(Key::Char('n'))) => {
+                game_state.do_action(GameStateAction::Restart);
+            }
             Some(Ok(Key::Left)) => {
                 game_state.do_action(GameStateAction::Move(BoardMove::Left));
             }
